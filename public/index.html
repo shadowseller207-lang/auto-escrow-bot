@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Escrow Admin Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%), radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.15) 0%, transparent 50%); }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        #login-screen { width: 100%; max-width: 400px; text-align: center; }
+        h1 { margin-bottom: 0.5rem; font-size: 1.8rem; font-weight: 600; }
+        p.subtitle { color: var(--text-muted); margin-bottom: 2rem; }
+        .input-group { margin-bottom: 1.2rem; text-align: left; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
+        .input-group input { width: 100%; padding: 0.8rem; border-radius: 8px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--glass-border); color: white; font-size: 1rem; outline: none; transition: border 0.2s; }
+        .input-group input:focus { border-color: var(--primary); }
+        button { width: 100%; padding: 0.9rem; border-radius: 8px; border: none; background: var(--primary); color: white; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+        button:hover { background: var(--primary-hover); }
+        button:active { transform: scale(0.98); }
+        .error-msg { color: var(--danger); font-size: 0.9rem; margin-top: 1rem; display: none; }
+        #dashboard-screen { width: 100%; max-width: 1200px; display: none; padding: 2rem; align-items: flex-start; gap: 2rem; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 2rem; }
+        .btn-outline { background: transparent; border: 1px solid var(--glass-border); width: auto; padding: 0.6rem 1.2rem; }
+        .btn-outline:hover { background: rgba(255,255,255,0.05); }
+        .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; width: 100%; }
+        .card { padding: 1.5rem; margin-bottom: 1.5rem; }
+        .card h2 { font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-main); }
+        .data-row { display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid var(--glass-border); }
+        .data-row:last-child { border-bottom: none; }
+        .data-label { color: var(--text-muted); }
+        .data-value { font-weight: 500; font-family: monospace; font-size: 1.1rem;}
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--glass-border); }
+        th { color: var(--text-muted); font-weight: 500; font-size: 0.9rem; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+        .status { padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+        .status.completed { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .status.pending { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .status.failed { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    </style>
+</head>
+<body>
+    <div id="login-screen" class="glass-panel">
+        <h1>Auto Escrow</h1>
+        <p class="subtitle">Admin Dashboard Login</p>
+        <form id="login-form">
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="username" value="admin" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" value="admin123" required>
+            </div>
+            <button type="submit">Login to Dashboard</button>
+            <div id="login-error" class="error-msg">Invalid credentials</div>
+        </form>
+    </div>
+
+    <div id="dashboard-screen">
+        <div style="width: 100%">
+            <div class="dashboard-header">
+                <h1>Dashboard Overview</h1>
+                <button class="btn-outline" onclick="logout()">Logout</button>
+            </div>
+            <div class="grid">
+                <div>
+                    <div class="glass-panel card">
+                        <h2>API & Security</h2>
+                        <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                            Use this API key in your Telegram bot.
+                        </p>
+                        <div class="data-row">
+                            <span class="data-label">Your API Key</span>
+                            <span class="data-value" id="api-key" style="color: var(--primary);">Loading...</span>
+                        </div>
+                        <button onclick="generateNewKey()" style="margin-top: 1rem;">Generate New Key</button>
+                    </div>
+                    <div class="glass-panel card">
+                        <h2>Gateway Settings</h2>
+                        <div class="data-row">
+                            <span class="data-label">Admin Username</span>
+                            <span class="data-value" id="admin-username">Loading...</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Target UPI ID</span>
+                            <span class="data-value" id="upi-id">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-panel card" style="margin-bottom: 0;">
+                    <h2>Recent Transactions</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Amount</th>
+                                <th>UTR</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payments-table">
+                            <tr><td colspan="5" style="text-align: center; padding: 2rem;">Loading payments...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        if (localStorage.getItem('admin_token')) showDashboard();
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('login-error');
+
+            try {
+                const res = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.setItem('admin_token', data.token);
+                    errorEl.style.display = 'none';
+                    showDashboard();
+                } else {
+                    errorEl.textContent = data.error || 'Login failed';
+                    errorEl.style.display = 'block';
+                }
+            } catch (err) {
+                errorEl.textContent = 'Network error';
+                errorEl.style.display = 'block';
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('admin_token');
+            document.getElementById('dashboard-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'block';
+            document.body.style.alignItems = 'center';
+        }
+
+        async function showDashboard() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dashboard-screen').style.display = 'flex';
+            document.body.style.alignItems = 'flex-start';
+            await loadDashboardData();
+        }
+
+        async function loadDashboardData() {
+            const token = localStorage.getItem('admin_token');
+            try {
+                const res = await fetch(`${API_BASE}/dashboard`, { headers: { 'Authorization': `Bearer ${token}` }});
+                if (res.status === 401) return logout();
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('api-key').textContent = data.admin.apiKey || 'None generated';
+                    document.getElementById('admin-username').textContent = data.admin.username;
+                    document.getElementById('upi-id').textContent = data.admin.upiId || 'Not Set';
+                    const tbody = document.getElementById('payments-table');
+                    tbody.innerHTML = '';
+                    if (data.payments.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No transactions yet</td></tr>';
+                    } else {
+                        data.payments.forEach(p => {
+                            const date = new Date(p.createdAt).toLocaleDateString() + ' ' + new Date(p.createdAt).toLocaleTimeString();
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td style="font-family: monospace;">${p.orderId}</td>
+                                <td style="font-weight: 600;">₹${p.amount}</td>
+                                <td>${p.utr || 'N/A'}</td>
+                                <td><span class="status ${p.status.toLowerCase()}">${p.status}</span></td>
+                                <td style="color: var(--text-muted); font-size: 0.9rem;">${date}</td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    }
+                }
+            } catch (err) { console.error("Failed to load data", err); }
+        }
+
+        async function generateNewKey() {
+            if(!confirm("Are you sure? Any bots using the old API Key will stop working immediately!")) return;
+            const token = localStorage.getItem('admin_token');
+            try {
+                const res = await fetch(`${API_BASE}/generate-key`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('api-key').textContent = data.apiKey;
+                    alert("New API Key generated successfully!");
+                }
+            } catch (err) { alert("Failed to generate key"); }
+        }
+    </script>
+</body>
+</html>
