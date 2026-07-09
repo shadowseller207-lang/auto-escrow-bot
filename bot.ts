@@ -265,7 +265,7 @@ bot.on('message', async (msg) => {
   }
 
   if (text === '/escrow') {
-    bot.sendMessage(chatId, 'ðŸ“ *Copy and fill this template:*\n\n`/deal\nBUYER : \nSELLER : \nDEAL AMOUNT :\nDEAL INFO :\nTIME TO COMPLETE DEAL : `', { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, '`/deal\nBUYER : \nSELLER : \nDEAL AMOUNT :\nDEAL INFO :\nTIME TO COMPLETE DEAL : `', { parse_mode: 'Markdown' });
     return;
   }
 
