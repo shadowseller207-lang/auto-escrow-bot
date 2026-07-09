@@ -3,11 +3,12 @@ services:
   - type: web
     name: payment-gateway-api
     env: node
+    plan: free
     buildCommand: npm install && npx prisma generate
     startCommand: npm run server
     envVars:
       - key: DATABASE_URL
-        sync: false # Set this manually in Render Dashboard from CockroachDB
+        sync: false 
       - key: PORT
         value: 3000
       - key: JWT_SECRET
@@ -17,12 +18,13 @@ services:
   - type: worker
     name: escrow-telegram-bot
     env: node
+    plan: free
     buildCommand: npm install && npx prisma generate
     startCommand: npm run bot
     envVars:
       - key: DATABASE_URL
-        sync: false # Set this manually in Render Dashboard from CockroachDB
+        sync: false 
       - key: TELEGRAM_BOT_TOKEN
-        sync: false # Set this manually in Render Dashboard
+        sync: false 
       - key: ALLOWED_TELEGRAM_USER_ID
-        sync: false # Set this manually in Render Dashboard
+        sync: false 
