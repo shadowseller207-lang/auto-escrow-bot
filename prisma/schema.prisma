@@ -8,36 +8,63 @@ datasource db {
 }
 
 model WebAdmin {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  apiKey    String?  @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Payment {
-  id              String   @id @default(cuid())
-  amount          Float
-  upiId           String
-  description     String?
-  status          String   @default("PENDING") 
-  transactionId   String?  @unique
-  senderName      String?
-  senderUpi       String?
-  completedAt     DateTime?
-  callbackUrl     String?  
-  metadata        String?  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               String   @id @default(cuid())
+  username         String   @unique
+  passwordHash     String
+  upiId            String?
+  merchantName     String?
+  gmailUser        String?
+  gmailAppPassword String?
+  apiKey           String?  @unique
+  isVerified       Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model Settings {
-  id            String   @id @default("singleton")
-  adminUpiId    String
-  adminName     String
-  dailyLimit    Float    @default(100000)
-  autoVerify    Boolean  @default(true)
-  webhookUrl    String?
-  updatedAt     DateTime @updatedAt
+  id                 String   @id @default("global")
+  dealCounter        Int      @default(0)
+  totalFeesCollected Float    @default(0.0)
+  updatedAt          DateTime @updatedAt
+}
+
+model EscrowDeal {
+  id                  String    @id
+  dealId              String    @unique
+  buyerUsername       String
+  sellerUsername      String
+  adminUsername       String    @default("shadow")
+  amount              Float
+  feeAmount           Float?
+  description         String?
+  timeToComplete      String?
+  expiresAt           DateTime?
+  chatId              String?
+  status              String    @default("WAITING_AGREEMENT")
+  buyerAgreed         Boolean   @default(false)
+  sellerAgreed        Boolean   @default(false)
+  buyerReleaseAction  String?
+  sellerReleaseAction String?
+  paymentOrderId      String?
+  pinnedMessageId     Int?
+  dealMessageId       Int?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime
+}
+
+model Transaction {
+  id        String   @id
+  orderId   String   @unique
+  amount    Float
+  utr       String?
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+}
+
+model User {
+  username  String   @id
+  upiId     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime
 }
