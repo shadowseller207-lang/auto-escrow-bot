@@ -92,8 +92,8 @@ app.post('/api/v2/verify', async (req, res) => {
     res.json({ success: true, payment });
 });
 
-// 5. Fallback for React/SPA routing
-app.get('*', (req, res) => {
+// 5. Serve Frontend
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
