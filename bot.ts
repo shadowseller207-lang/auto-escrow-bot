@@ -20,7 +20,7 @@ if (!token) {
 
 const bot = new TelegramBot(token, { polling: true });
 
-console.log('🤖 Telegram Client Bot is running...');
+console.log('ðŸ¤– Telegram Client Bot is running...');
 
 const userStates = new Map<number, { mode: string, amount?: string, orderId?: string, dealId?: string }>();
 
@@ -62,7 +62,7 @@ bot.on('message', async (msg) => {
     const dealId = state.dealId;
     const deal = await prisma.escrowDeal.findUnique({ where: { dealId } });
     if (!deal) {
-      bot.sendMessage(chatId, '❌ Deal not found.');
+      bot.sendMessage(chatId, 'âŒ Deal not found.');
       userStates.delete(chatId);
       return;
     }
@@ -82,13 +82,13 @@ bot.on('message', async (msg) => {
     
     const botInfo = await bot.getMe();
     
-    const eCheck = '✅';
-    const eMoney = '💰';
-    const eUser = '🔹';
-    const eTick = '✔️';
-    const eShield = '💎';
+    const eCheck = 'âœ…';
+    const eMoney = 'ðŸ’°';
+    const eUser = 'ðŸ”¹';
+    const eTick = 'âœ”ï¸';
+    const eShield = 'ðŸ’Ž';
 
-    const successMessage = `✦ GAMERS ESCROW TEAM ✦\n#${newCounter} ESCROW COMPLETED ${eCheck}\n\n${eMoney} Deal completed successfully!\n\n${eUser} Escrower: ${botInfo.username}\n\n${eTick} Deal Completed ‼️\n${eTick} Funds Released Successfully${eCheck}\n${eTick} Safe & Trusted Trade ${eShield}\n\nThank you for choosing ✦ ✦ GAMERS ESCROW TEAM ✦ ✦`;
+    const successMessage = `âœ¦ GAMERS ESCROW TEAM âœ¦\n#${newCounter} ESCROW COMPLETED ${eCheck}\n\n${eMoney} Deal completed successfully!\n\n${eUser} Escrower: ${botInfo.username}\n\n${eTick} Deal Completed â€¼ï¸\n${eTick} Funds Released Successfully${eCheck}\n${eTick} Safe & Trusted Trade ${eShield}\n\nThank you for choosing âœ¦ âœ¦ GAMERS ESCROW TEAM âœ¦ âœ¦`;
 
     if (deal.chatId) {
       const sendOpts: any = { parse_mode: 'HTML' };
@@ -108,7 +108,7 @@ bot.on('message', async (msg) => {
       }
     }
     
-    bot.sendMessage(chatId, `✅ Screenshot successfully posted and pinned in the group for deal \`${dealId}\`!`, { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, `âœ… Screenshot successfully posted and pinned in the group for deal \`${dealId}\`!`, { parse_mode: 'Markdown' });
     userStates.delete(chatId);
     return;
   }
@@ -119,19 +119,19 @@ bot.on('message', async (msg) => {
     });
 
     if (pendingDeal && pendingDeal.paymentOrderId) {
-      await bot.sendMessage(chatId, `🔍 Payment screenshot received! Verifying payment instantly...`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `ðŸ” Payment screenshot received! Verifying payment instantly...`, { parse_mode: 'Markdown' });
       
       try {
         const response = await apiCall('/verify', 'POST', { orderId: pendingDeal.paymentOrderId });
         if (response.success) {
           await prisma.escrowDeal.update({ where: { dealId: pendingDeal.dealId }, data: { status: 'IN_PROGRESS' } });
           const escapeMd = (str: string) => str ? str.replace(/[_*[\]`]/g, '\\$&') : '';
-          const successMsg = await bot.sendMessage(chatId, `🎉 *Payment Successful!*\n✅ @${escapeMd(pendingDeal.sellerUsername)} Payment received! Continue your deal in private.\nOnce done, buyer should use \`/payment ${pendingDeal.dealId}\``, { parse_mode: 'Markdown' });
+          const successMsg = await bot.sendMessage(chatId, `ðŸŽ‰ *Payment Successful!*\nâœ… @${escapeMd(pendingDeal.sellerUsername)} Payment received! Continue your deal in private.\nOnce done, buyer should use \`/payment ${pendingDeal.dealId}\``, { parse_mode: 'Markdown' });
           try {
             await bot.pinChatMessage(chatId, successMsg.message_id);
           } catch (e) { console.error('Pin failed', e); }
         } else {
-          bot.sendMessage(chatId, `❌ Verification Failed: We checked the emails but couldn't find the payment yet. If you just paid, please wait a minute and send the screenshot again.`);
+          bot.sendMessage(chatId, `âŒ Verification Failed: We checked the emails but couldn't find the payment yet. If you just paid, please wait a minute and send the screenshot again.`);
         }
       } catch (error) {
         console.error('Instant verification error:', error);
@@ -142,28 +142,28 @@ bot.on('message', async (msg) => {
 
   if (state.mode === 'SETTING_UPI_ID') {
     await apiCall('/settings', 'POST', { upiId: text });
-    bot.sendMessage(chatId, `✅ UPI ID has been set to: \`${text}\``, { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, `âœ… UPI ID has been set to: \`${text}\``, { parse_mode: 'Markdown' });
     userStates.delete(chatId);
     return;
   }
 
   if (state.mode === 'SETTING_MERCHANT') {
     await apiCall('/settings', 'POST', { merchantName: text });
-    bot.sendMessage(chatId, `✅ Merchant Name has been set to: \`${text}\``, { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, `âœ… Merchant Name has been set to: \`${text}\``, { parse_mode: 'Markdown' });
     userStates.delete(chatId);
     return;
   }
 
   if (state.mode === 'SETTING_GMAIL') {
     await apiCall('/settings', 'POST', { gmailUser: text });
-    bot.sendMessage(chatId, `✅ Gmail Address has been set to: \`${text}\``, { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, `âœ… Gmail Address has been set to: \`${text}\``, { parse_mode: 'Markdown' });
     userStates.delete(chatId);
     return;
   }
 
   if (state.mode === 'SETTING_APP_PASS') {
     await apiCall('/settings', 'POST', { gmailAppPassword: text });
-    bot.sendMessage(chatId, `✅ Gmail App Password has been saved securely!`, { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, `âœ… Gmail App Password has been saved securely!`, { parse_mode: 'Markdown' });
     userStates.delete(chatId);
     return;
   }
@@ -171,7 +171,7 @@ bot.on('message', async (msg) => {
   if (state.mode === 'USER_SETTING_UPI') {
     const username = msg.from?.username;
     if (!username) {
-      bot.sendMessage(chatId, '❌ You need to have a Telegram username to set your UPI ID.');
+      bot.sendMessage(chatId, 'âŒ You need to have a Telegram username to set your UPI ID.');
       userStates.delete(chatId);
       return;
     }
@@ -180,7 +180,7 @@ bot.on('message', async (msg) => {
       update: { upiId: text },
       create: { username, upiId: text }
     });
-    bot.sendMessage(chatId, `✅ Your UPI ID has been set to: \`${text}\`\n\nYou are now eligible for deals! Now fill the form again in the group.`, { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, `âœ… Your UPI ID has been set to: \`${text}\`\n\nYou are now eligible for deals! Now fill the form again in the group.`, { parse_mode: 'Markdown' });
     userStates.delete(chatId);
     return;
   }
@@ -192,14 +192,14 @@ bot.on('message', async (msg) => {
   }
 
   if (text === '/start') {
-    bot.sendMessage(chatId, '✦ *GAMERS ESCROW TEAM* ✦\n\n👋 *Welcome to the Premium Escrow Bot!*\n\n*User Commands:*\n🔹 `/escrow` - Get a blank deal form\n🔹 `/deal` - Send filled form to create deal\n🔹 `/payment <deal_id>` - Complete/Refund a deal\n\n*Admin Commands:*\n⚙️ `/admin` - View Dashboard\n🔑 `/addadmin` - Add Web Admin\n\nUse `/help` for detailed instructions.', { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, 'âœ¦ *GAMERS ESCROW TEAM* âœ¦\n\nðŸ‘‹ *Welcome to the Premium Escrow Bot!*\n\n*User Commands:*\nðŸ”¹ `/escrow` - Get a blank deal form\nðŸ”¹ `/deal` - Send filled form to create deal\nðŸ”¹ `/payment <deal_id>` - Complete/Refund a deal\n\n*Admin Commands:*\nâš™ï¸ `/admin` - View Dashboard\nðŸ”‘ `/addadmin` - Add Web Admin\n\nUse `/help` for detailed instructions.', { parse_mode: 'Markdown' });
     userStates.delete(chatId);
     return;
   }
 
   if (text === '/admin') {
     if (!isAuthorized(userId)) {
-      bot.sendMessage(chatId, '❌ You are not authorized to access the Admin Panel.');
+      bot.sendMessage(chatId, 'âŒ You are not authorized to access the Admin Panel.');
       return;
     }
     try {
@@ -207,13 +207,13 @@ bot.on('message', async (msg) => {
       if (!data.success) throw new Error(data.message);
 
       const recentTx = data.recentTx.map((t: any) =>
-        `• ₹${t.amount} - ${t.status === 'PAID' ? '✅' : '⏳'} (ID: \`${t.orderId}\`)`
+        `â€¢ â‚¹${t.amount} - ${t.status === 'PAID' ? 'âœ…' : 'â³'} (ID: \`${t.orderId}\`)`
       ).join('\n');
 
-      const message = `📊 *Admin Dashboard*\n\n` +
-        `💰 *Total Revenue:* ₹${data.totalRevenue.toLocaleString()}\n` +
-        `✅ *Paid Orders:* ${data.paidCount}\n` +
-        `⏳ *Pending Orders:* ${data.pendingCount}\n\n` +
+      const message = `ðŸ“Š *Admin Dashboard*\n\n` +
+        `ðŸ’° *Total Revenue:* â‚¹${data.totalRevenue.toLocaleString()}\n` +
+        `âœ… *Paid Orders:* ${data.paidCount}\n` +
+        `â³ *Pending Orders:* ${data.pendingCount}\n\n` +
         `*Recent Transactions:*\n${recentTx || 'No transactions yet.'}\n\n` +
         `*Settings Configuration:* Use the buttons below to setup your Gateway.`;
 
@@ -221,9 +221,9 @@ bot.on('message', async (msg) => {
         parse_mode: 'Markdown' as const,
         reply_markup: {
           inline_keyboard: [
-            [{ text: '⚙️ Set UPI ID', callback_data: 'set_upi' }, { text: '🏪 Set Merchant', callback_data: 'set_merchant' }],
-            [{ text: '📧 Set Gmail', callback_data: 'set_gmail' }, { text: '🔑 Set App Pass', callback_data: 'set_app_pass' }],
-            [{ text: '🔍 View Current Config', callback_data: 'view_config' }]
+            [{ text: 'âš™ï¸ Set UPI ID', callback_data: 'set_upi' }, { text: 'ðŸª Set Merchant', callback_data: 'set_merchant' }],
+            [{ text: 'ðŸ“§ Set Gmail', callback_data: 'set_gmail' }, { text: 'ðŸ”‘ Set App Pass', callback_data: 'set_app_pass' }],
+            [{ text: 'ðŸ” View Current Config', callback_data: 'view_config' }]
           ]
         }
       };
@@ -231,7 +231,7 @@ bot.on('message', async (msg) => {
       bot.sendMessage(chatId, message, options);
     } catch (err) {
       console.error(err);
-      bot.sendMessage(chatId, '❌ Failed to fetch admin stats from API Server.');
+      bot.sendMessage(chatId, 'âŒ Failed to fetch admin stats from API Server.');
     }
     userStates.delete(chatId);
     return;
@@ -240,14 +240,14 @@ bot.on('message', async (msg) => {
   if (text.startsWith('/addadmin ')) {
     const masterAdminId = allowedUser?.split(',')[0]?.trim();
     if (userId !== masterAdminId) {
-      bot.sendMessage(chatId, '❌ Only the Master Admin (Owner) is authorized to add web admins.');
+      bot.sendMessage(chatId, 'âŒ Only the Master Admin (Owner) is authorized to add web admins.');
       return;
     }
     const parts = text.split(' ');
     const adminUser = parts[1];
     const adminPass = parts[2];
     if (!adminUser || !adminPass) {
-      bot.sendMessage(chatId, '⚠️ Usage: `/addadmin <username> <password>`', { parse_mode: 'Markdown' });
+      bot.sendMessage(chatId, 'âš ï¸ Usage: `/addadmin <username> <password>`', { parse_mode: 'Markdown' });
       return;
     }
     try {
@@ -255,45 +255,44 @@ bot.on('message', async (msg) => {
       await prisma.webAdmin.create({
         data: { username: adminUser, passwordHash }
       });
-      bot.sendMessage(chatId, `✅ Web Dashboard Admin created successfully!\n\nUsername: \`${adminUser}\`\nPassword: \`${adminPass}\`\nLogin at your Web Dashboard!`, { parse_mode: 'Markdown' });
+      bot.sendMessage(chatId, `âœ… Web Dashboard Admin created successfully!\n\nUsername: \`${adminUser}\`\nPassword: \`${adminPass}\`\nLogin at your Web Dashboard!`, { parse_mode: 'Markdown' });
     } catch (err: any) {
       console.error('Add Admin error:', err);
-      if (err.code === 'P2002') bot.sendMessage(chatId, '❌ Admin username already exists.');
-      else bot.sendMessage(chatId, '❌ Failed to add admin.');
+      if (err.code === 'P2002') bot.sendMessage(chatId, 'âŒ Admin username already exists.');
+      else bot.sendMessage(chatId, 'âŒ Failed to add admin.');
     }
     return;
   }
 
   if (text === '/escrow') {
-    bot.sendMessage(chatId, '📝 *Copy and fill this template:*\n\n`/deal\nBUYER : @username\nSELLER : @username\nDEAL AMOUNT : 500\nADMIN : shadow\nDEAL INFO : BGMI ID 123456\nTIME TO COMPLETE DEAL : 30 Mins`', { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, 'ðŸ“ *Copy and fill this template:*\n\n`/deal\nBUYER : \nSELLER : \nDEAL AMOUNT :\nDEAL INFO :\nTIME TO COMPLETE DEAL : `', { parse_mode: 'Markdown' });
     return;
   }
 
   if (text.startsWith('/deal')) {
     const lines = text.split('\n');
-    let buyer = '', seller = '', amount = 0, desc = '', time = '', adminUsername = 'shadow';
+    let buyer = '', seller = '', amount = 0, desc = '', time = '', adminUsername = 'admin';
     for (const line of lines) {
       if (line.toUpperCase().startsWith('BUYER :')) buyer = line.split(':')[1].trim().replace('@', '');
       if (line.toUpperCase().startsWith('SELLER :')) seller = line.split(':')[1].trim().replace('@', '');
       if (line.toUpperCase().startsWith('DEAL AMOUNT :')) amount = parseFloat(line.split(':')[1].trim());
-      if (line.toUpperCase().startsWith('ADMIN :')) adminUsername = line.split(':')[1].trim().replace('@', '');
       if (line.toUpperCase().startsWith('DEAL INFO :')) desc = line.split(':')[1].trim();
       if (line.toUpperCase().startsWith('TIME TO COMPLETE DEAL :')) time = line.split(':')[1].trim();
     }
 
     if (!buyer || !seller || !amount) {
-      bot.sendMessage(chatId, '⚠️ Invalid form. Make sure you provide BUYER, SELLER, and DEAL AMOUNT.');
+      bot.sendMessage(chatId, 'âš ï¸ Invalid form. Make sure you provide BUYER, SELLER, and DEAL AMOUNT.');
       return;
     }
 
     const adminUser = await prisma.webAdmin.findUnique({ where: { username: adminUsername } });
     if (!adminUser || !adminUser.isVerified) {
-      bot.sendMessage(chatId, `⚠️ Admin \`${adminUsername}\` not found or their Gmail is not verified. Please choose a valid admin.`, { parse_mode: 'Markdown' });
+      bot.sendMessage(chatId, `âš ï¸ Admin \`${adminUsername}\` not found or their Gmail is not verified. Please choose a valid admin.`, { parse_mode: 'Markdown' });
       return;
     }
 
     if (!adminUser.upiId) {
-      bot.sendMessage(chatId, `⚠️ Admin \`${adminUsername}\` has not set up their UPI ID yet. Deal cannot proceed.`, { parse_mode: 'Markdown' });
+      bot.sendMessage(chatId, `âš ï¸ Admin \`${adminUsername}\` has not set up their UPI ID yet. Deal cannot proceed.`, { parse_mode: 'Markdown' });
       return;
     }
 
@@ -301,7 +300,7 @@ bot.on('message', async (msg) => {
     const sellerUser = await prisma.user.findUnique({ where: { username: seller } });
     if (!buyerUser?.upiId || !sellerUser?.upiId) {
       const escapeMd = (str: string) => str ? str.replace(/[_*[\]`]/g, '\\$&') : '';
-      bot.sendMessage(chatId, `⚠️ @${escapeMd(buyer)} @${escapeMd(seller)}\nPlease set your UPI ID for payments before creating a deal.`, {
+      bot.sendMessage(chatId, `âš ï¸ @${escapeMd(buyer)} @${escapeMd(seller)}\nPlease set your UPI ID for payments before creating a deal.`, {
         parse_mode: 'Markdown',
         reply_markup: {
           inline_keyboard: [[{ text: 'Set UPI ID', url: 'https://t.me/auto_escrowbot?start=setupi' }]]
@@ -317,19 +316,19 @@ bot.on('message', async (msg) => {
 
     const escapeHtml = (str: string) => str ? str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
 
-    const eDeal = '💎';
-    const eID = '💠';
-    const eAmount = '💰';
-    const eInfo = '⚠️';
-    const eTime = '⌛';
-    const eUser = '🔹';
-    const eAdmin = '🛡';
+    const eDeal = 'ðŸ’Ž';
+    const eID = 'ðŸ’ ';
+    const eAmount = 'ðŸ’°';
+    const eInfo = 'âš ï¸';
+    const eTime = 'âŒ›';
+    const eUser = 'ðŸ”¹';
+    const eAdmin = 'ðŸ›¡';
 
-    const sentMsg = await bot.sendMessage(chatId, `✦ <b>GAMERS ESCROW TEAM</b> ✦\n\n${eDeal} <b>NEW ESCROW DEAL CREATED</b>\n\n${eID} <b>Deal ID:</b> <code>${dealId}</code>\n\n${eUser} <b>Buyer:</b> @${escapeHtml(buyer)}\n${eUser} <b>Seller:</b> @${escapeHtml(seller)}\n${eAdmin} <b>Admin:</b> @${escapeHtml(adminUsername)}\n${eAmount} <b>Amount:</b> ₹${amount}\n\n${eInfo} <b>Details:</b> ${escapeHtml(desc)}\n${eTime} <b>Time:</b> ${escapeHtml(time)}\n\n<i>⚠️ Both parties must agree by clicking below.</i>`, {
+    const sentMsg = await bot.sendMessage(chatId, `âœ¦ <b>GAMERS ESCROW TEAM</b> âœ¦\n\n${eDeal} <b>NEW ESCROW DEAL CREATED</b>\n\n${eID} <b>Deal ID:</b> <code>${dealId}</code>\n\n${eUser} <b>Buyer:</b> @${escapeHtml(buyer)}\n${eUser} <b>Seller:</b> @${escapeHtml(seller)}\n${eAdmin} <b>Admin:</b> @${escapeHtml(adminUsername)}\n${eAmount} <b>Amount:</b> â‚¹${amount}\n\n${eInfo} <b>Details:</b> ${escapeHtml(desc)}\n${eTime} <b>Time:</b> ${escapeHtml(time)}\n\n<i>âš ï¸ Both parties must agree by clicking below.</i>`, {
       parse_mode: 'HTML',
       reply_markup: {
         inline_keyboard: [
-          [{ text: 'Buyer Agree ✅', callback_data: `agree_buyer_${dealId}` }, { text: 'Seller Agree ✅', callback_data: `agree_seller_${dealId}` }]
+          [{ text: 'Buyer Agree âœ…', callback_data: `agree_buyer_${dealId}` }, { text: 'Seller Agree âœ…', callback_data: `agree_seller_${dealId}` }]
         ]
       }
     });
@@ -339,14 +338,14 @@ bot.on('message', async (msg) => {
 
   if (text.startsWith('/edit ')) {
     if (!isAuthorized(userId)) {
-      bot.sendMessage(chatId, '❌ You are not authorized.');
+      bot.sendMessage(chatId, 'âŒ You are not authorized.');
       return;
     }
     const parts = text.split(' ');
     const numStr = parts[1]; // /edit 5 -> parts[1] is 5
     const num = parseInt(numStr);
     if (isNaN(num)) {
-      bot.sendMessage(chatId, '⚠️ Please provide a valid number. Usage: `/edit <number>`', { parse_mode: 'Markdown' });
+      bot.sendMessage(chatId, 'âš ï¸ Please provide a valid number. Usage: `/edit <number>`', { parse_mode: 'Markdown' });
       return;
     }
     await prisma.settings.upsert({
@@ -354,33 +353,33 @@ bot.on('message', async (msg) => {
       update: { dealCounter: num },
       create: { id: 'global', dealCounter: num }
     });
-    bot.sendMessage(chatId, `✅ Deal counter updated to ${num}. The next completed deal will be #${num + 1}.`);
+    bot.sendMessage(chatId, `âœ… Deal counter updated to ${num}. The next completed deal will be #${num + 1}.`);
     return;
   }
 
   if (text.startsWith('/payment')) {
     const dealId = text.split(' ')[1];
     if (!dealId) {
-      bot.sendMessage(chatId, '⚠️ Provide deal ID: `/payment deal_123`', { parse_mode: 'Markdown' });
+      bot.sendMessage(chatId, 'âš ï¸ Provide deal ID: `/payment deal_123`', { parse_mode: 'Markdown' });
       return;
     }
     const deal = await prisma.escrowDeal.findUnique({ where: { dealId } });
     if (!deal) {
-      bot.sendMessage(chatId, '❌ Deal not found.');
+      bot.sendMessage(chatId, 'âŒ Deal not found.');
       return;
     }
     if (deal.status !== 'IN_PROGRESS') {
-      bot.sendMessage(chatId, `⚠️ Deal is not in progress. Current status: ${deal.status}`);
+      bot.sendMessage(chatId, `âš ï¸ Deal is not in progress. Current status: ${deal.status}`);
       return;
     }
 
     const escapeMd = (str: string) => str ? str.replace(/[_*[\]`]/g, '\\$&') : '';
 
-    bot.sendMessage(chatId, `⚖️ *Release or Refund Deal:*\n\`${dealId}\`\n\nBoth Buyer (@${escapeMd(deal.buyerUsername)}) and Seller (@${escapeMd(deal.sellerUsername)}) must choose an option:`, {
+    bot.sendMessage(chatId, `âš–ï¸ *Release or Refund Deal:*\n\`${dealId}\`\n\nBoth Buyer (@${escapeMd(deal.buyerUsername)}) and Seller (@${escapeMd(deal.sellerUsername)}) must choose an option:`, {
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [
-          [{ text: 'Release Funds ✅', callback_data: `release_${dealId}` }, { text: 'Refund Funds ❌', callback_data: `refund_${dealId}` }]
+          [{ text: 'Release Funds âœ…', callback_data: `release_${dealId}` }, { text: 'Refund Funds âŒ', callback_data: `refund_${dealId}` }]
         ]
       }
     });
@@ -388,14 +387,14 @@ bot.on('message', async (msg) => {
   }
 
   if (text === '/help') {
-    const helpMsg = `🤖 *Escrow Bot Commands*\n\n` +
-      `👤 *User Commands:*\n` +
-      `🔹 \`/escrow\` - Get the blank deal template.\n` +
-      `🔹 \`/deal\` - Send the filled deal template to start a deal.\n` +
-      `🔹 \`/payment <deal_id>\` - Release or Refund a deal.\n\n` +
-      `🛡 *Admin Commands:*\n` +
-      `🔹 \`/admin\` - View stats and configure API/Gmail settings.\n` +
-      `🔹 \`/edit <number>\` - Change the deal counter manually.\n\n` +
+    const helpMsg = `ðŸ¤– *Escrow Bot Commands*\n\n` +
+      `ðŸ‘¤ *User Commands:*\n` +
+      `ðŸ”¹ \`/escrow\` - Get the blank deal template.\n` +
+      `ðŸ”¹ \`/deal\` - Send the filled deal template to start a deal.\n` +
+      `ðŸ”¹ \`/payment <deal_id>\` - Release or Refund a deal.\n\n` +
+      `ðŸ›¡ *Admin Commands:*\n` +
+      `ðŸ”¹ \`/admin\` - View stats and configure API/Gmail settings.\n` +
+      `ðŸ”¹ \`/edit <number>\` - Change the deal counter manually.\n\n` +
       `*How to use:*\n` +
       `1. Make sure your UPI is set by clicking 'Set UPI ID' if prompted.\n` +
       `2. Type \`/escrow\` in the group and copy the template.\n` +
@@ -430,11 +429,11 @@ bot.on('callback_query', async (query) => {
     const data = await apiCall('/settings');
     const settings = data.settings || {};
     bot.sendMessage(chatId,
-      `🔍 *Current API Configuration*\n\n` +
-      `*UPI ID:* ${settings.upiId || 'Not Set ❌'}\n` +
-      `*Merchant:* ${settings.merchantName || 'Not Set ❌'}\n` +
-      `*Gmail:* ${settings.gmailUser || 'Not Set ❌'}\n` +
-      `*App Password:* ${settings.gmailAppPassword ? '******** ✅' : 'Not Set ❌'}\n`,
+      `ðŸ” *Current API Configuration*\n\n` +
+      `*UPI ID:* ${settings.upiId || 'Not Set âŒ'}\n` +
+      `*Merchant:* ${settings.merchantName || 'Not Set âŒ'}\n` +
+      `*Gmail:* ${settings.gmailUser || 'Not Set âŒ'}\n` +
+      `*App Password:* ${settings.gmailAppPassword ? '******** âœ…' : 'Not Set âŒ'}\n`,
       { parse_mode: 'Markdown' }
     );
   } else if (data?.startsWith('agree_')) {
@@ -459,7 +458,7 @@ bot.on('callback_query', async (query) => {
     if (updatedDeal?.buyerAgreed && updatedDeal?.sellerAgreed && updatedDeal.status === 'WAITING_AGREEMENT') {
       await prisma.escrowDeal.update({ where: { dealId }, data: { status: 'WAITING_PAYMENT' } });
 
-      bot.sendMessage(chatId, `🔄 Generating QR Code for Deal \`${dealId}\`...`, { parse_mode: 'Markdown' });
+      bot.sendMessage(chatId, `ðŸ”„ Generating QR Code for Deal \`${dealId}\`...`, { parse_mode: 'Markdown' });
 
       try {
         const adminUser = await prisma.webAdmin.findUnique({ where: { username: updatedDeal.adminUsername } });
@@ -480,17 +479,17 @@ bot.on('callback_query', async (query) => {
         const escapeMd = (str: string) => str ? str.replace(/[_*[\]`]/g, '\\$&') : '';
 
         await bot.sendPhoto(chatId, imageBuffer, {
-          caption: `✅ *QR Code Generated for Deal*\n\`${dealId}\`\n@${escapeMd(deal.buyerUsername)} Please complete the payment.\n\n📡 *Real-time scanning is active.* The bot will verify your payment instantly the moment it is received!\n*(If it takes too long, just REPLY to this message with your payment screenshot to force a check).*`,
+          caption: `âœ… *QR Code Generated for Deal*\n\`${dealId}\`\n@${escapeMd(deal.buyerUsername)} Please complete the payment.\n\nðŸ“¡ *Real-time scanning is active.* The bot will verify your payment instantly the moment it is received!\n*(If it takes too long, just REPLY to this message with your payment screenshot to force a check).*`,
           parse_mode: 'Markdown'
         });
       } catch (error: any) {
         console.error('Error generating QR:', error);
-        bot.sendMessage(chatId, `❌ Failed to generate QR code: ${error.message || 'Check Server logs.'}`);
+        bot.sendMessage(chatId, `âŒ Failed to generate QR code: ${error.message || 'Check Server logs.'}`);
       }
     }
   } else if (data?.startsWith('verify_')) {
     const orderId = data.replace('verify_', '');
-    const msgToPin = await bot.sendMessage(chatId, `🔍 Verifying payment for Order: \`${orderId}\`...`, { parse_mode: 'Markdown' });
+    const msgToPin = await bot.sendMessage(chatId, `ðŸ” Verifying payment for Order: \`${orderId}\`...`, { parse_mode: 'Markdown' });
 
     try {
       const escrowDeal = await prisma.escrowDeal.findFirst({ where: { paymentOrderId: orderId } });
@@ -498,22 +497,22 @@ bot.on('callback_query', async (query) => {
 
       const response = await apiCall('/verify', 'POST', { orderId, adminUsername: escrowDeal.adminUsername });
       if (response.success) {
-        await bot.sendMessage(chatId, `🎉 *Payment Successful!*\nOrder \`${orderId}\` has been verified.`, { parse_mode: 'Markdown' });
+        await bot.sendMessage(chatId, `ðŸŽ‰ *Payment Successful!*\nOrder \`${orderId}\` has been verified.`, { parse_mode: 'Markdown' });
 
         const escapeMd = (str: string) => str ? str.replace(/[_*[\]`]/g, '\\$&') : '';
         if (escrowDeal) {
           await prisma.escrowDeal.update({ where: { dealId: escrowDeal.dealId }, data: { status: 'IN_PROGRESS' } });
-          const successMsg = await bot.sendMessage(chatId, `✅ @${escapeMd(escrowDeal.sellerUsername)} Payment received! Continue your deal in private.\nOnce done, buyer should use \`/payment ${escrowDeal.dealId}\``, { parse_mode: 'Markdown' });
+          const successMsg = await bot.sendMessage(chatId, `âœ… @${escapeMd(escrowDeal.sellerUsername)} Payment received! Continue your deal in private.\nOnce done, buyer should use \`/payment ${escrowDeal.dealId}\``, { parse_mode: 'Markdown' });
           try {
             await bot.pinChatMessage(chatId, successMsg.message_id);
           } catch (e) { console.error('Pin failed', e); }
         }
       } else {
-        bot.sendMessage(chatId, `❌ Verification Failed: ${response.message || 'Payment Pending/Not Found. Please wait and try again.'}`);
+        bot.sendMessage(chatId, `âŒ Verification Failed: ${response.message || 'Payment Pending/Not Found. Please wait and try again.'}`);
       }
     } catch (error: any) {
       console.error('Verification Error:', error);
-      bot.sendMessage(chatId, `❌ Error calling Verification API.`);
+      bot.sendMessage(chatId, `âŒ Error calling Verification API.`);
     }
   } else if (data?.startsWith('release_') || data?.startsWith('refund_')) {
     const actionType = data.startsWith('release_') ? 'RELEASE' : 'REFUND';
@@ -539,34 +538,34 @@ bot.on('callback_query', async (query) => {
 
         await prisma.escrowDeal.update({ where: { dealId }, data: { status: 'PAYOUT_PENDING', feeAmount } });
         
-        bot.sendMessage(chatId, `⏳ *Both parties agreed to release funds.*\n*1% Gateway Fee:* ₹${feeAmount.toFixed(2)}\n*Net Payout to Seller:* ₹${payoutAmount.toFixed(2)}\nWaiting for Admin to process payout...`, { parse_mode: 'Markdown' });
+        bot.sendMessage(chatId, `â³ *Both parties agreed to release funds.*\n*1% Gateway Fee:* â‚¹${feeAmount.toFixed(2)}\n*Net Payout to Seller:* â‚¹${payoutAmount.toFixed(2)}\nWaiting for Admin to process payout...`, { parse_mode: 'Markdown' });
         
         if (allowedUser) {
           const escapeMd = (str: string) => str ? str.replace(/[_*[\]`]/g, '\\$&') : '';
           const sellerUser = await prisma.user.findUnique({ where: { username: deal.sellerUsername } });
           const upiText = sellerUser?.upiId ? `\nUPI ID: \`${sellerUser.upiId}\`` : '\nUPI ID: `Not Found`';
-          notifyAdmins(`🔔 *Payout Required*\nDeal: \`${dealId}\`\nTotal Deal: ₹${deal.amount.toFixed(2)}\nGateway Fee (1%): ₹${feeAmount.toFixed(2)}\n\nPay ₹${payoutAmount.toFixed(2)} to Seller: @${escapeMd(deal.sellerUsername)}${upiText}`, {
+          notifyAdmins(`ðŸ”” *Payout Required*\nDeal: \`${dealId}\`\nTotal Deal: â‚¹${deal.amount.toFixed(2)}\nGateway Fee (1%): â‚¹${feeAmount.toFixed(2)}\n\nPay â‚¹${payoutAmount.toFixed(2)} to Seller: @${escapeMd(deal.sellerUsername)}${upiText}`, {
             parse_mode: 'Markdown',
             reply_markup: {
               inline_keyboard: [
-                [{ text: '✅ Upload Payout SS', callback_data: `admin_upload_ss_${dealId}` }]
+                [{ text: 'âœ… Upload Payout SS', callback_data: `admin_upload_ss_${dealId}` }]
               ]
             }
           });
         }
       } else if (updatedDeal.buyerReleaseAction === 'REFUND' && updatedDeal.sellerReleaseAction === 'REFUND') {
         await prisma.escrowDeal.update({ where: { dealId }, data: { status: 'REFUNDED' } });
-        bot.sendMessage(chatId, `❌ *Deal ${dealId} Cancelled*\nFunds will be refunded to buyer. Admins notified.`, { parse_mode: 'Markdown' });
+        bot.sendMessage(chatId, `âŒ *Deal ${dealId} Cancelled*\nFunds will be refunded to buyer. Admins notified.`, { parse_mode: 'Markdown' });
         if (allowedUser) {
           const escapeMd = (str: string) => str ? str.replace(/[_*[\]`]/g, '\\$&') : '';
           const buyerUser = await prisma.user.findUnique({ where: { username: deal.buyerUsername } });
           const upiText = buyerUser?.upiId ? `\nUPI ID: \`${buyerUser.upiId}\`` : '\nUPI ID: `Not Found`';
-          notifyAdmins(`🔔 *Refund Required*\nDeal: \`${dealId}\`\nRefund ₹${deal.amount} to Buyer: @${escapeMd(deal.buyerUsername)}${upiText}`, { parse_mode: 'Markdown' });
+          notifyAdmins(`ðŸ”” *Refund Required*\nDeal: \`${dealId}\`\nRefund â‚¹${deal.amount} to Buyer: @${escapeMd(deal.buyerUsername)}${upiText}`, { parse_mode: 'Markdown' });
         }
       } else {
         await prisma.escrowDeal.update({ where: { dealId }, data: { buyerReleaseAction: null, sellerReleaseAction: null, status: 'MANUAL_INTERVENTION' } });
-        bot.sendMessage(chatId, `⚠️ Both are not agree please click button again otherwise deal handled manually.`, { parse_mode: 'Markdown' });
-        if (allowedUser) notifyAdmins(`🚨 *Dispute Alert*\nDeal: ${dealId}\nBuyer and Seller selected different actions!`, { parse_mode: 'Markdown' });
+        bot.sendMessage(chatId, `âš ï¸ Both are not agree please click button again otherwise deal handled manually.`, { parse_mode: 'Markdown' });
+        if (allowedUser) notifyAdmins(`ðŸš¨ *Dispute Alert*\nDeal: ${dealId}\nBuyer and Seller selected different actions!`, { parse_mode: 'Markdown' });
       }
     }
   } else if (data?.startsWith('admin_upload_ss_')) {
@@ -575,7 +574,7 @@ bot.on('callback_query', async (query) => {
       return bot.answerCallbackQuery(query.id, { text: 'You are not authorized.', show_alert: true });
     }
     userStates.set(chatId, { mode: 'AWAITING_SS', dealId });
-    bot.sendMessage(chatId, `📸 Please send the payment screenshot for Deal: \`${dealId}\``, { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, `ðŸ“¸ Please send the payment screenshot for Deal: \`${dealId}\``, { parse_mode: 'Markdown' });
   }
 
   bot.answerCallbackQuery(query.id);
@@ -603,7 +602,7 @@ setInterval(async () => {
     for (const deal of expiredDeals) {
       await prisma.escrowDeal.update({ where: { dealId: deal.dealId }, data: { status: 'CANCELLED' } });
       if (deal.chatId) {
-        bot.sendMessage(deal.chatId, `⏳ *Deal Auto-Cancelled*\nDeal \`${deal.dealId}\` has been automatically cancelled because payment/agreement was not completed within 3 hours.`, { parse_mode: 'Markdown' });
+        bot.sendMessage(deal.chatId, `â³ *Deal Auto-Cancelled*\nDeal \`${deal.dealId}\` has been automatically cancelled because payment/agreement was not completed within 3 hours.`, { parse_mode: 'Markdown' });
       }
     }
   } catch (err) {
@@ -616,11 +615,11 @@ async function startRealTimeScanner() {
   try {
     const verifiedAdmins = await prisma.webAdmin.findMany({ where: { isVerified: true } });
     if (verifiedAdmins.length === 0) {
-      console.log('⚠️ Skipping real-time scanner: No verified admins found.');
+      console.log('âš ï¸ Skipping real-time scanner: No verified admins found.');
       return;
     }
 
-    console.log(`📡 Starting real-time IMAP scanners for ${verifiedAdmins.length} admins...`);
+    console.log(`ðŸ“¡ Starting real-time IMAP scanners for ${verifiedAdmins.length} admins...`);
 
     for (const admin of verifiedAdmins) {
       const user = admin.gmailUser;
@@ -643,9 +642,9 @@ async function startRealTimeScanner() {
       try {
         await client.connect();
         await client.getMailboxLock('INBOX');
-        console.log(`✅ Listening for instant payments for admin: ${admin.username}`);
+        console.log(`âœ… Listening for instant payments for admin: ${admin.username}`);
       } catch (err) {
-        console.error(`❌ Failed to connect IMAP for ${admin.username}`);
+        console.error(`âŒ Failed to connect IMAP for ${admin.username}`);
         continue;
       }
 
@@ -675,7 +674,7 @@ async function startRealTimeScanner() {
                   const chatId = deal.chatId;
                   const escapeMd = (str: string) => str ? str.replace(/[_*[\]`]/g, '\\$&') : '';
                   if (chatId) {
-                     const successMsg = await bot.sendMessage(chatId, `🎉 *Instant Payment Detected (Admin: ${admin.username})!*\n✅ @${escapeMd(deal.sellerUsername)} Payment received in real-time! Continue your deal in private.\nOnce done, buyer should use \`/payment ${deal.dealId}\``, { parse_mode: 'Markdown' });
+                     const successMsg = await bot.sendMessage(chatId, `ðŸŽ‰ *Instant Payment Detected (Admin: ${admin.username})!*\nâœ… @${escapeMd(deal.sellerUsername)} Payment received in real-time! Continue your deal in private.\nOnce done, buyer should use \`/payment ${deal.dealId}\``, { parse_mode: 'Markdown' });
                      try { await bot.pinChatMessage(chatId, successMsg.message_id); } catch (e) {}
                   }
                }
@@ -697,3 +696,4 @@ async function startRealTimeScanner() {
 }
 
 startRealTimeScanner();
+
