@@ -286,8 +286,8 @@ bot.on('message', async (msg) => {
     }
 
     const adminUser = await prisma.webAdmin.findUnique({ where: { username: adminUsername } });
-    if (!adminUser || !adminUser.isVerified) {
-      bot.sendMessage(chatId, `âš ï¸ Admin \`${adminUsername}\` not found or their Gmail is not verified. Please choose a valid admin.`, { parse_mode: 'Markdown' });
+    if (!adminUser) {
+      bot.sendMessage(chatId, `âš ï¸ Admin \`${adminUsername}\` not found.`, { parse_mode: 'Markdown' });
       return;
     }
 
