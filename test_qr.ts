@@ -1,0 +1,1 @@
+import fs from 'fs'; async function test() { const res = await fetch('https://fam-way-pro.onrender.com/qr-gen?amount=500&gmail_key=Nc1raoYA'); const json = await res.json(); fs.writeFileSync('test_qr.png', json.data.qr_code.base64.replace(/^data:image\/png;base64,/, ''), 'base64'); console.log('Saved'); } test();
