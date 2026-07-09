@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model WebAdmin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  apiKey    String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id              String   @id @default(cuid())
+  amount          Float
+  upiId           String
+  description     String?
+  status          String   @default("PENDING") 
+  transactionId   String?  @unique
+  senderName      String?
+  senderUpi       String?
+  completedAt     DateTime?
+  callbackUrl     String?  
+  metadata        String?  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Settings {
+  id            String   @id @default("singleton")
+  adminUpiId    String
+  adminName     String
+  dailyLimit    Float    @default(100000)
+  autoVerify    Boolean  @default(true)
+  webhookUrl    String?
+  updatedAt     DateTime @updatedAt
+}
