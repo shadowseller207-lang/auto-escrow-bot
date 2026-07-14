@@ -312,7 +312,7 @@ bot.on('message', async (msg) => {
     const dealId = 'deal_' + Date.now();
     try {
       await prisma.escrowDeal.create({
-        data: { dealId, buyerUsername: buyer, sellerUsername: seller, amount, description: desc, timeToComplete: time, chatId: chatId.toString(), adminUsername }
+        data: { id: dealId, dealId, buyerUsername: buyer, sellerUsername: seller, amount, description: desc, timeToComplete: time, chatId: chatId.toString(), adminUsername }
       });
     } catch (err) {
       console.error('Error creating deal:', err);
