@@ -265,18 +265,17 @@ bot.on('message', async (msg) => {
   }
 
   if (text === '/escrow') {
-    bot.sendMessage(chatId, '📝 *Copy and fill this template:*\n\n`/deal\nBUYER : \nSELLER : \nDEAL AMOUNT :\nADMIN :\nDEAL INFO :\nTIME TO COMPLETE DEAL : `', { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, '`/deal\nBUYER : \nSELLER : \nDEAL AMOUNT :\nDEAL INFO :\nTIME TO COMPLETE DEAL : `', { parse_mode: 'Markdown' });
     return;
   }
 
   if (text.startsWith('/deal')) {
     const lines = text.split('\n');
-    let buyer = '', seller = '', amount = 0, desc = '', time = '', adminUsername = 'shadow';
+    let buyer = '', seller = '', amount = 0, desc = '', time = '', adminUsername = 'admin';
     for (const line of lines) {
       if (line.toUpperCase().startsWith('BUYER :')) buyer = line.split(':')[1].trim().replace('@', '');
       if (line.toUpperCase().startsWith('SELLER :')) seller = line.split(':')[1].trim().replace('@', '');
       if (line.toUpperCase().startsWith('DEAL AMOUNT :')) amount = parseFloat(line.split(':')[1].trim());
-      if (line.toUpperCase().startsWith('ADMIN :')) adminUsername = line.split(':')[1].trim().replace('@', '');
       if (line.toUpperCase().startsWith('DEAL INFO :')) desc = line.split(':')[1].trim();
       if (line.toUpperCase().startsWith('TIME TO COMPLETE DEAL :')) time = line.split(':')[1].trim();
     }
@@ -287,8 +286,8 @@ bot.on('message', async (msg) => {
     }
 
     const adminUser = await prisma.webAdmin.findUnique({ where: { username: adminUsername } });
-    if (!adminUser || !adminUser.isVerified) {
-      bot.sendMessage(chatId, `⚠️ Admin \`${adminUsername}\` not found or their Gmail is not verified. Please choose a valid admin.`, { parse_mode: 'Markdown' });
+    if (!adminUser) {
+      bot.sendMessage(chatId, `⚠️ Admin \`${adminUsername}\` not found.`, { parse_mode: 'Markdown' });
       return;
     }
 
@@ -311,9 +310,15 @@ bot.on('message', async (msg) => {
     }
 
     const dealId = 'deal_' + Date.now();
-    await prisma.escrowDeal.create({
-      data: { dealId, buyerUsername: buyer, sellerUsername: seller, amount, description: desc, timeToComplete: time, chatId: chatId.toString(), adminUsername }
-    });
+    try {
+      await prisma.escrowDeal.create({
+        data: { dealId, buyerUsername: buyer, sellerUsername: seller, amount, description: desc, timeToComplete: time, chatId: chatId.toString(), adminUsername }
+      });
+    } catch (err) {
+      console.error('Error creating deal:', err);
+      bot.sendMessage(chatId, '❌ Failed to create the deal due to a database error. Please try again or contact an administrator.');
+      return;
+    }
 
     const escapeHtml = (str: string) => str ? str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
 
