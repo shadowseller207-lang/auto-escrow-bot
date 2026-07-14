@@ -192,7 +192,7 @@ bot.on('message', async (msg) => {
   }
 
   if (text === '/start') {
-    bot.sendMessage(chatId, '✦ *GAMERS ESCROW TEAM* ✦\n\n👋 *Welcome to the Premium Escrow Bot!*\n\n*User Commands:*\n🔹 `/escrow` - Get a blank deal form\n🔹 `/deal` - Send filled form to create deal\n🔹 `/payment <deal_id>` - Complete/Refund a deal\n\n*Admin Commands:*\n⚙️ `/admin` - View Dashboard\n🔑 `/addadmin` - Add Web Admin\n\nUse `/help` for detailed instructions.', { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, '\u2726 *GAMERS ESCROW TEAM* \u2726\n\n\uD83D\uDC4B *Welcome to the Premium Escrow Bot!*\n\n*User Commands:*\n\uD83D\uDD39 `/escrow` - Get a blank deal form\n\uD83D\uDD39 `/deal` - Send filled form to create deal\n\uD83D\uDD39 `/payment <deal_id>` - Complete/Refund a deal\n\n*Admin Commands:*\n\u2699\uFE0F `/admin` - View Dashboard\n\uD83D\uDD11 `/addadmin` - Add Web Admin\n\nUse `/help` for detailed instructions.', { parse_mode: 'Markdown' });
     userStates.delete(chatId);
     return;
   }
@@ -265,7 +265,7 @@ bot.on('message', async (msg) => {
   }
 
   if (text === '/escrow') {
-    bot.sendMessage(chatId, '`/deal\nBUYER : \nSELLER : \nDEAL AMOUNT :\nDEAL INFO :\nTIME TO COMPLETE DEAL : `', { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, '📝 *Copy and fill this template:*\n\n`/deal\nBUYER : \nSELLER : \nDEAL AMOUNT :\nADMIN : \nDEAL INFO :\nTIME TO COMPLETE DEAL : `', { parse_mode: 'Markdown' });
     return;
   }
 
@@ -276,6 +276,10 @@ bot.on('message', async (msg) => {
       if (line.toUpperCase().startsWith('BUYER :')) buyer = line.split(':')[1].trim().replace('@', '');
       if (line.toUpperCase().startsWith('SELLER :')) seller = line.split(':')[1].trim().replace('@', '');
       if (line.toUpperCase().startsWith('DEAL AMOUNT :')) amount = parseFloat(line.split(':')[1].trim());
+      if (line.toUpperCase().startsWith('ADMIN :')) {
+        const parsedAdmin = line.split(':')[1].trim().replace('@', '');
+        if (parsedAdmin) adminUsername = parsedAdmin;
+      }
       if (line.toUpperCase().startsWith('DEAL INFO :')) desc = line.split(':')[1].trim();
       if (line.toUpperCase().startsWith('TIME TO COMPLETE DEAL :')) time = line.split(':')[1].trim();
     }
