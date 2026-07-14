@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import QRCode from 'qrcode';
 import prisma from './lib/db';
 import path from 'path';
 
@@ -129,12 +130,16 @@ app.post('/api/settings', async (req, res) => {
 
 app.post('/api/pay', async (req, res) => {
     try {
-        const { amount } = req.body;
+        const { amount, upiId, merchantName } = req.body;
         const orderId = 'ORD' + Math.floor(Math.random() * 1000000);
         await prisma.transaction.create({
             data: { id: orderId, orderId, amount: parseFloat(amount) }
         });
-        res.json({ success: true, payment: { orderId } });
+        
+        const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName || 'Merchant')}&am=${amount}&tr=${orderId}&cu=INR`;
+        const qrBase64 = await QRCode.toDataURL(upiUrl);
+
+        res.json({ success: true, data: { orderId, qrBase64, upiUrl } });
     } catch (error) {
         res.status(500).json({ success: false });
     }
